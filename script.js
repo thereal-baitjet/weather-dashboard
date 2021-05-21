@@ -1,7 +1,7 @@
 const apiKey = "0b64c884989be34accb83c0b53a2df03"
 var city = "New York"
 // var dateEl = document.getElementsByClassName("currentDate").innerHTML;
-var currentDate = document.getElementById("currentDate")
+var currentDate = ""
 var searchInput = document.getElementById("searchInput")
 var seachButton = document.getElementById("searchButton")
 var temp = document.getElementById("temp")
@@ -9,7 +9,11 @@ var humidity = document.getElementById("humidity")
 var windSpeed = document.getElementById("windSpeed")
 var uvIndex = document.getElementById("uvIndex")
 var cardRow = document.getElementById("cardRow")
-var pastSearches = ["boston", "atlanta"]
+var pastSearches = JSON.parse(localStorage.getItem("pastSearches")) || [];
+var historyList = document.getElementById("historyItems")
+var historyitems = document.getElementsByClassName("historyItems")
+
+
 
 
 searchButton.addEventListener("click", function () {
@@ -18,10 +22,23 @@ searchButton.addEventListener("click", function () {
     console.log(city)
     getCityData(city)
     getCityForecast(city)
+    localStorage.setItem("pastSearches", JSON.stringify(pastSearches)) 
 })
 console.log(currentDate)
 // value of what is input is city that is searched
+historyitems.addEventListener("click", function()  {
+    var city = historyitems.textContent
+    console.log(city)
+    getCityData(city)
+    getCityForecast(city)
+})
 
+for (i = 0; i < pastSearches.length < 5; i++) {
+    var listItem = document.createElement("li")
+    listItem.setAttribute("class", "historyItems")
+    listItem.textContent = pastSearches[i]
+    historyList.appendChild(listItem)
+}
 
 var today = new Date();
 var dd = String(today.getDate()).padStart(2, '0');
@@ -52,7 +69,7 @@ function getCityData(city) {
 }
 // pulls input fro selected city and places on text content for temp, humidity, windspeed and uvindex 
 function generateWeatherUrl(city) {
-    var url = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
+    var url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apiKey;
     console.log(url);
     return url
 }
@@ -67,7 +84,7 @@ function kToF(k) {
 //api.openweathermap.org/data/2.5/forecast?q={city name}&appid={API key}
 
 function generateFiveDayUrl(city) {
-    var url = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + apiKey;
+    var url = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&appid=" + apiKey;
     console.log(url);
     return url
 }
@@ -109,7 +126,7 @@ function getCityForecast(city) {
 
 function renderCard(slot) {
     var date = slot.dt_txt.slice(0,10)
-    var iconUrl = "http://openweathermap.org/img/w/" + slot.weather[0].icon + ".png"
+    var iconUrl = "https://openweathermap.org/img/w/" + slot.weather[0].icon + ".png"
     var html = `<div class="card" style="width: 12rem;">
     <div class="card-body">
         <h5 class="card-title">${date}</h5>
@@ -130,3 +147,10 @@ window.addEventListener("click", function(event){
 
 function renderBtn() {
 }
+
+function uvindexCall() {
+    var url2 = "https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid={API key}" 
+    console.log(url2);
+    return url2
+}
+
